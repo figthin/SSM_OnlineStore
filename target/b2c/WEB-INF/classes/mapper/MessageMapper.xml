@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.MessageMapper">
+
+    <select id="query" parameterType="map" resultType="map">
+        SELECT * FROM message WHERE is_delete = 0
+        <if test="messageId != null">
+            AND message_id = #{messageId}
+        </if>
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="type != null">
+            AND type = #{type}
+        </if>
+    </select>
+
+</mapper>

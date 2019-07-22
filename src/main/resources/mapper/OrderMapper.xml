@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.OrderMapper">
+
+
+    <resultMap id="queryResultMap" type="map">
+        <id column="order_id" property="order_id"/>
+        <id column="user_id" property="user_id"/>
+        <id column="time_create" property="time_create"/>
+        <id column="time_pay" property="time_pay"/>
+        <id column="time_finish" property="time_finish"/>
+        <id column="trading_status" property="trading_status"/>
+        <id column="operate" property="operate"/>
+        <id column="order_status" property="order_status"/>
+        <id column="is_delete" property="is_delete"/>
+        <id column="address_id" property="address_id"/>
+        <collection property="children"
+                    ofType="map"
+                    column="address_id"
+                    select="com.oaec.b2c.mapper.AddressMapper.queryByAddressId"/>
+    </resultMap>
+
+    <select id="query" parameterType="map" resultMap="queryResultMap">
+        SELECT * FROM orders WHERE user_id = #{userId}
+    </select>
+
+    <resultMap id="orderResultMap" type="map">
+        <id column="cart_id" property="cartId"/>
+        <id column="user_id" property="userId"/>
+        <id column="product_id" property="productId"/>
+        <id column="amount" property="amount"/>
+        <id column="color" property="color"/>
+        <id column="cart_size" property="size"/>
+        <collection property="product"
+                    ofType="map"
+                    column="product_id"
+                    select="com.oaec.b2c.mapper.ProductMapper.queryById"/>
+    </resultMap>
+
+    <select id="queryByCartIds" parameterType="int" resultMap="orderResultMap">
+        SELECT *,cart.amount * product.price + product.freight totalPrice FROM cart,product WHERE cart.product_id = product.product_id AND cart.cart_id IN(
+        <foreach collection="array" item="cartIds" separator="," index="index">
+            #{cartIds}
+        </foreach>)
+    </select>
+
+    <select id="queryTotalByCartIds" parameterType="int" resultType="map">
+        SELECT cart.amount * product.price FROM cart,product WHERE cart.product_id = product.product_id AND cart_id IN(
+        <foreach collection="array" item="cartIds" separator="," index="index">
+            #{cartIds}
+        </foreach>)
+    </select>
+
+    <insert id="insert" parameterType="map">
+        INSERT INTO orders (user_id, address_id) VALUES (#{userId},#{addressId})
+    </insert>
+
+    <select id="queryNextOrderId" parameterType="map" resultType="map">
+        SELECT MAX(order_id) nextOrderId FROM orders WHERE user_id = #{userId}
+    </select>
+    
+    <select id="queryLatestOrders" parameterType="int" resultType="map">
+        SELECT * FROM ORDERS WHERE USER_ID = #{userId} ORDER BY TIME_CREATE DESC
+    </select>
+
+    <select id="queryByOrderId" resultType="map" parameterType="int">
+        SELECT * FROM ORDERS WHERE order_id = #{orderId}
+    </select>
+    
+    <!--<select id="queryByOrderStatusIs0" resultType="map" parameterMap="queryResultMap">
+        SELECT * FROM ORDERS WHERE ORDER_STATUS = 0 AND USER_ID = #{userId}
+    </select>
+
+    <select id="queryByOrderStatusIs1" resultType="map" parameterMap="queryResultMap">
+        SELECT * FROM ORDERS WHERE ORDER_STATUS = 1 AND USER_ID = #{userId}
+    </select>
+
+    <select id="queryByOrderStatusIs2" resultType="map" parameterMap="queryResultMap">
+        SELECT * FROM ORDERS WHERE ORDER_STATUS = 2 AND USER_ID = #{userId}
+    </select>-->
+
+    <select id="queryByAddressId" parameterType="int" resultType="map">
+        SELECT * FROM ORDERS WHERE address_id = #{addressId}
+    </select>
+</mapper>

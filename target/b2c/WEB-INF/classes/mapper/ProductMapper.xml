@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.ProductMapper">
+
+    <select id="query" parameterType="map" resultType="map">
+        SELECT product.*,class1.class1_id,class1.class1_name,class2.class2_id,class2.class2_name,class3.class3_name FROM product,class1,class2,class3 WHERE product.class_id = class3.class3_id AND class3.class2_id = class2.class2_id AND class2.class1_id = class1.class1_id AND product.is_delete = 0 AND class1.is_delete=0 AND class2.is_delete=0 AND class3.is_delete=0
+        <if test="productId != null">
+            AND product_id = #{productId}
+        </if>
+        <if test="name != null">
+            AND name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <if test="class3Id != null">
+            AND class_id = #{class3Id}
+        </if>
+        <if test="class2Id != null">
+            AND class2.class2_id = #{class2Id}
+        </if>
+        <if test="class1Id != null">
+            AND class1.class1_id = #{class1Id}
+        </if>
+    </select>
+
+    <select id="queryById" parameterType="map" resultType="map">
+        SELECT * FROM product WHERE product_id = #{productId}
+    </select>
+
+    <select id="queryHot" resultType="map">
+        SELECT * FROM product ORDER BY sale DESC ;
+    </select>
+
+    <update id="update" parameterType="map">
+        UPDATE product set sale = sale + #{amount},stock = stock - #{amount} WHERE product_id=#{productId}
+    </update>
+</mapper>

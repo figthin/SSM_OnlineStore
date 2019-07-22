@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.AddressMapper">
+
+    <select id="query" parameterType="map" resultType="map">
+        SELECT * FROM address WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="map">
+        INSERT INTO address (name, tel, address_detail, user_id) VALUES (#{name},#{tel},#{addressDetail},#{userId})
+    </insert>
+
+    <update id="updateDefault">
+        UPDATE ADDRESS SET IS_DEFAULT = 0
+    </update>
+
+    <select id="queryByAddressId" parameterType="int" resultType="map">
+        SELECT * FROM address WHERE address_id = #{addressId}
+    </select>
+
+    <select id="queryByOrderId" parameterType="int" resultType="map">
+        SELECT * FROM ADDRESS WHERE ADDRESS_ID = (SELECT ADDRESS_ID FROM ORDERS WHERE order_id = #{orderId})
+    </select>
+
+    <update id="update" parameterType="map">
+        UPDATE address SET address_id=#{addressId},name=#{name},address_detail=#{addressDetail},is_default=#{isDefault} WHERE address_id=#{addressId}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM address WHERE address_id=#{addressId}
+    </delete>
+
+    <update id="autoSetDefault" parameterType="int">
+        UPDATE address SET is_default = 1 WHERE address_id = #{addressId}
+    </update>
+
+    <select id="queryLatestAddress">
+        SELECT max(address_id) address_id FROM address ORDER BY add_time DESC
+    </select>
+
+    <update id="updateDefaultAddress" parameterType="int">
+        UPDATE address SET is_default = 1 WHERE address_id = #{addressId}
+    </update>
+</mapper>

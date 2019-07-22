@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.UserMapper">
+
+    <select id="query" resultType="map" parameterType="map">
+        SELECT * FROM users WHERE tel = #{tel} AND password = #{password} AND is_delete = 0
+    </select>
+
+    <select id="queryByUserId" parameterType="int" resultType="map">
+        SELECT * FROM users WHERE user_id = #{userId}
+    </select>
+
+    <insert id="doInsert" parameterType="map">
+        INSERT INTO users (tel, password) VALUES (#{tel}, #{password})
+    </insert>
+
+    <update id="doUpdate" parameterType="map">
+        UPDATE USERS SET USERS.balance = USERS.balance + #{money} WHERE USER_ID = #{userId}
+    </update>
+
+    <update id="doSubUpdate" parameterType="map">
+        UPDATE USERS SET USERS.balance = USERS.balance - #{money} WHERE USER_ID = #{userId}
+    </update>
+
+    <update id="updateCheckIn" parameterType="int">
+        UPDATE USERS SET CHECK_IN = CHECK_IN + 1,INTEGRAL = INTEGRAL + 3 WHERE USER_ID = #{userId}
+    </update>
+
+    <update id="updateMessage" parameterType="map">
+        UPDATE USERS SET USER_NAME = #{userName},GENDER = #{gender},BIRTH = STR_TO_DATE(#{birth},'%Y-%m-%d') WHERE USER_ID = #{userId}
+    </update>
+
+    <update id="updateMemberLevel" parameterType="map">
+        UPDATE users SET is_member = #{memberLevel},balance = balance-#{money} WHERE user_id = #{userId}
+    </update>
+
+    <select id="queryByTel" parameterType="map" resultType="map">
+        SELECT * FROM users WHERE TEL = #{tel}
+    </select>
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.CartMapper">
+
+
+    <resultMap id="cartResultMap" type="map">
+        <id column="cart_id" property="cartId"/>
+        <id column="user_id" property="userId"/>
+        <id column="product_id" property="productId"/>
+        <id column="amount" property="amount"/>
+        <id column="color" property="color"/>
+        <id column="cart_size" property="size"/>
+        <collection property="children"
+                    ofType="map"
+                    select="com.oaec.b2c.mapper.ProductMapper.queryById"
+                    column="product_id"/>
+    </resultMap>
+
+    <select id="queryByProductId" parameterType="map" resultType="map">
+        SELECT * FROM cart WHERE user_id = #{userId} AND product_id = #{productId} AND color = #{color} AND cart_size = #{size}
+    </select>
+
+    <insert id="insert" parameterType="map">
+        INSERT INTO cart (user_id, product_id, amount, color, cart_size) VALUES (#{userId},#{productId},#{amount},#{color},#{size})
+    </insert>
+
+    <update id="update" parameterType="map">
+        UPDATE cart SET amount = amount + #{amount} WHERE user_id = #{userId} AND product_id = #{productId} AND color = #{color} AND cart_size = #{size}
+    </update>
+
+
+    <select id="queryTotalByProductId" parameterType="map" resultType="map">
+        SELECT (cart.amount*product.price)totalPrice FROM cart,product WHERE cart.product_id = product.product_id AND cart_id=#{cartId};
+    </select>
+
+    <select id="query" parameterType="map" resultMap="cartResultMap">
+        SELECT * FROM cart WHERE user_id = #{userId}
+    </select>
+
+    <delete id="delete" parameterType="map">
+        DELETE FROM cart WHERE user_id = #{userId} AND product_id = #{productId} AND color = #{color} AND cart_size = #{size}
+    </delete>
+
+    <update id="addAmount" parameterType="map">
+        UPDATE cart SET amount = amount + 1 WHERE cart_id = #{cartId}
+    </update>
+
+    <update id="subAmount" parameterType="map">
+        UPDATE cart SET amount = amount - 1 WHERE cart_id = #{cartId}
+    </update>
+
+    <select id="total" parameterType="int" resultType="map">
+        SELECT SUM(CART.AMOUNT) totalAmount, SUM(PRODUCT.PRICE*CART.AMOUNT+product.freight) totalPrice FROM CART,PRODUCT WHERE CART.PRODUCT_ID = PRODUCT.PRODUCT_ID AND CART.CART_ID IN(
+        <foreach collection="array" item="cartIds" index="index" separator=",">
+            #{cartIds}
+        </foreach>)
+    </select>
+
+    <select id="queryAmountByUserId" parameterType="int" resultType="map">
+        SELECT COUNT(cart_id) count FROM cart WHERE user_id = #{userId}
+    </select>
+
+    <select id="queryByCartId" parameterType="int" resultMap="cartResultMap">
+        SELECT * FROM cart WHERE cart_id = #{cartId}
+    </select>
+
+    <!--<resultMap id="queryByCartIdsResultMap" type="map">
+        <id column="cart_id" property="cart_id"/>
+        <id column="user_id" property="user_id"/>
+        <id column="product_id" property="product_id"/>
+        <id column="amount" property="amount"/>
+        <id column="color" property="color"/>
+        <id column="cart_size" property="cart_size"/>
+        <collection property="children"
+                    ofType="map"
+                    column="product_id"
+                    select="com.oaec.b2c.mapper.ProductMapper.queryById"/>
+
+    </resultMap>
+
+    <select id="queryByCartIds" parameterType="int" resultMap="queryByCartIdsResultMap">
+        SELECT * FROM cart WHERE cart_id IN (
+            <foreach collection="array" item="#{cartId}" separator="," index="index">
+                #{cartId}
+            </foreach>
+            )
+    </select>-->
+
+    <delete id="deleteAll" parameterType="map">
+        DELETE FROM cart WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByCartIds" parameterType="int">
+        DELETE FROM cart WHERE cart_id IN (
+            <foreach collection="array" index="index" item="cartId" separator=",">
+                #{cartId}
+            </foreach>
+            )
+    </delete>
+</mapper>

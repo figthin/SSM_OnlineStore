@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.OrderDetailMapper">
+
+    <insert id="insert" parameterType="map">
+        INSERT INTO order_detail (order_id, product_id, price, url, amount, freight, color, product_size,  name)
+        VALUES (#{orderId},#{productId},#{price},#{url},#{amount},#{freight},#{color},#{productSize},#{name})
+    </insert>
+
+    <select id="queryTotalPriceByOrderId" resultType="map" parameterType="int">
+        SELECT sum(order_detail.price*order_detail.AMOUNT + product.freight) totalPrice FROM ORDER_DETAIL,product WHERE order_detail.product_id = product.product_id AND ORDER_ID = #{orderId}
+    </select>
+    
+    <select id="query" parameterType="int" resultType="map">
+        SELECT * FROM ORDER_DETAIL WHERE ORDER_ID = #{orderId}
+    </select>
+</mapper>

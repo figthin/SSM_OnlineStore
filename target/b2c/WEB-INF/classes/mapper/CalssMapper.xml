@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.b2c.mapper.ClassMapper">
+
+    <resultMap id="classResultMap" type="map">
+        <id column="class1_id" property="class1Id"/>
+        <result column="class1_name" property="class1Name"/>
+        <collection property="children"
+                    ofType="map"
+                    select="queryClass2"
+                    column="class1_id"/>
+    </resultMap>
+
+    <select id="queryClass1" resultMap="classResultMap">
+        SELECT class1_id,class1_name FROM class1
+    </select>
+
+    <select id="queryClass2" parameterType="int" resultType="map">
+        SELECT * FROM class2 WHERE class1_id = #{class1Id}
+    </select>
+
+</mapper>
